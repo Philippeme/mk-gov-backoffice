@@ -1,0 +1,170 @@
+# Admin Routes
+admin:
+    path: /admin
+    controller: App\Controller\Admin\DashboardController::index
+
+admin_dashboard:
+    path: /admin/dashboard
+    controller: App\Controller\Admin\DashboardController::index
+
+# Requests Routes
+admin_requests:
+    path: /admin/requests
+    controller: App\Controller\Admin\RequestController::index
+
+admin_requests_show:
+    path: /admin/requests/{id}
+    controller: App\Controller\Admin\RequestController::show
+    requirements:
+        id: '\d+'
+
+admin_requests_new:
+    path: /admin/requests/new
+    controller: App\Controller\Admin\RequestController::new
+
+admin_requests_edit:
+    path: /admin/requests/{id}/edit
+    controller: App\Controller\Admin\RequestController::edit
+    requirements:
+        id: '\d+'
+
+admin_requests_delete:
+    path: /admin/requests/{id}/delete
+    controller: App\Controller\Admin\RequestController::delete
+    requirements:
+        id: '\d+'
+    methods: [POST]
+
+# Procedures Routes
+admin_procedures:
+    path: /admin/procedures
+    controller: App\Controller\Admin\ProcedureController::index
+
+admin_procedures_show:
+    path: /admin/procedures/{id}
+    controller: App\Controller\Admin\ProcedureController::show
+    requirements:
+        id: '\d+'
+
+admin_procedures_new:
+    path: /admin/procedures/new
+    controller: App\Controller\Admin\ProcedureController::new
+
+admin_procedures_edit:
+    path: /admin/procedures/{id}/edit
+    controller: App\Controller\Admin\ProcedureController::edit
+    requirements:
+        id: '\d+'
+
+admin_procedures_delete:
+    path: /admin/procedures/{id}/delete
+    controller: App\Controller\Admin\ProcedureController::delete
+    requirements:
+        id: '\d+'
+    methods: [POST]
+
+# Documents Routes
+admin_documents:
+    path: /admin/documents
+    controller: App\Controller\Admin\DocumentController::index
+
+admin_documents_show:
+    path: /admin/documents/{id}
+    controller: App\Controller\Admin\DocumentController::show
+    requirements:
+        id: '\d+'
+
+admin_documents_new:
+    path: /admin/documents/new
+    controller: App\Controller\Admin\DocumentController::new
+
+admin_documents_edit:
+    path: /admin/documents/{id}/edit
+    controller: App\Controller\Admin\DocumentController::edit
+    requirements:
+        id: '\d+'
+
+admin_documents_delete:
+    path: /admin/documents/{id}/delete
+    controller: App\Controller\Admin\DocumentController::delete
+    requirements:
+        id: '\d+'
+    methods: [POST]
+
+# Users Routes
+admin_users:
+    path: /admin/users
+    controller: App\Controller\Admin\UserController::index
+
+admin_users_show:
+    path: /admin/users/{id}
+    controller: App\Controller\Admin\UserController::show
+    requirements:
+        id: '\d+'
+
+admin_users_new:
+    path: /admin/users/new
+    controller: App\Controller\Admin\UserController::new
+
+admin_users_edit:
+    path: /admin/users/{id}/edit
+    controller: App\Controller\Admin\UserController::edit
+    requirements:
+        id: '\d+'
+
+admin_users_delete:
+    path: /admin/users/{id}/delete
+    controller: App\Controller\Admin\UserController::delete
+    requirements:
+        id: '\d+'
+    methods: [POST]
+
+# Public Entities Routes
+admin_public_entities:
+    path: /admin/public-entities
+    controller: App\Controller\Admin\PublicEntityController::index
+
+admin_public_entities_show:
+    path: /admin/public-entities/{id}
+    controller: App\Controller\Admin\PublicEntityController::show
+    requirements:
+        id: '\d+'
+
+admin_public_entities_new:
+    path: /admin/public-entities/new
+    controller: App\Controller\Admin\PublicEntityController::new
+
+admin_public_entities_edit:
+    path: /admin/public-entities/{id}/edit
+    controller: App\Controller\Admin\PublicEntityController::edit
+    requirements:
+        id: '\d+'
+
+admin_public_entities_delete:
+    path: /admin/public-entities/{id}/delete
+    controller: App\Controller\Admin\PublicEntityController::delete
+    requirements:
+        id: '\d+'
+    methods: [POST]
+
+# System Routes
+admin_system_settings:
+    path: /admin/system/settings
+    controller: App\Controller\Admin\SystemController::settings
+
+admin_system_reference_data:
+    path: /admin/system/reference-data
+    controller: App\Controller\Admin\SystemController::referenceData
+
+admin_system_logs:
+    path: /admin/system/logs
+    controller: App\Controller\Admin\SystemController::logs
+
+# Security Routes
+admin_login:
+    path: /admin/login
+    controller: App\Controller\SecurityController::login
+
+admin_logout:
+    path: /admin/logout
+    controller: App\Controller\SecurityController::logout

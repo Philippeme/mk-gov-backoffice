@@ -1,0 +1,544 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block title %}{{ 'dashboard.title'|trans }} - MK Gov Backoffice{% endblock %}
+
+{% block page_title %}{{ 'dashboard.title'|trans }}{% endblock %}
+
+{% block page_subtitle %}
+    <p class="text-muted mb-0">{{ 'dashboard.overview'|trans }}</p>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Filters Section -->
+    <div class="filters-section mb-4">
+        <div class="card">
+            <div class="card-body py-3">
+                <form id="dashboardFilters" class="row g-3 align-items-center">
+                    <div class="col-md-2">
+                        <label class="form-label small">{{ 'dashboard.filters.region'|trans }}</label>
+                        <select name="region" class="form-select form-select-sm">
+                            <option value="all">{{ 'dashboard.filters.all'|trans }}</option>
+                            {% for key, region in regions %}
+                                {% if key != 'all' %}
+                                <option value="{{ key }}" {{ filters.region == key ? 'selected' : '' }}>{{ region }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">{{ 'dashboard.filters.service_family'|trans }}</label>
+                        <select name="service_family" class="form-select form-select-sm">
+                            <option value="all">{{ 'dashboard.filters.all'|trans }}</option>
+                            {% for key, family in service_families %}
+                                {% if key != 'all' %}
+                                <option value="{{ key }}" {{ filters.service_family == key ? 'selected' : '' }}>{{ family }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">{{ 'dashboard.filters.request_status'|trans }}</label>
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="all">{{ 'dashboard.filters.all'|trans }}</option>
+                            {% for key, status in statuses %}
+                                {% if key != 'all' %}
+                                <option value="{{ key }}" {{ filters.status == key ? 'selected' : '' }}>{{ status }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">{{ 'dashboard.filters.year'|trans }}</label>
+                        <select name="year" class="form-select form-select-sm">
+                            {% for key, year in years %}
+                                <option value="{{ key }}" {{ filters.year == key ? 'selected' : '' }}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-filter me-1"></i>{{ 'forms.filter'|trans }}
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="resetFilters">
+                                <i class="fas fa-undo me-1"></i>{{ 'forms.reset'|trans }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="statistics-section mb-4">
+        <div class="row g-4">
+            <!-- Birth Declarations Rate -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card orange">
+                    <div class="stat-icon">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ data.statistics.birth_declarations_rate }}%</div>
+                        <div class="stat-label">{{ 'dashboard.charts.birth_rate'|trans }}</div>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success"></i>
+                        <span class="trend-value">+2.1%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Missing Births Percentage -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ data.statistics.missing_births_percentage }}%</div>
+                        <div class="stat-label">{{ 'dashboard.charts.missing_births'|trans }}</div>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-down text-danger"></i>
+                        <span class="trend-value">-0.5%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Supplementary Judgments -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card red">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ data.statistics.supplementary_judgments_count }}</div>
+                        <div class="stat-label">{{ 'dashboard.charts.supplementary_judgments'|trans }}</div>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-minus text-warning"></i>
+                        <span class="trend-value">0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Marriage Opposition Rate -->
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card gray">
+                    <div class="stat-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ data.statistics.marriage_opposition_rate }}%</div>
+                        <div class="stat-label">{{ 'dashboard.charts.marriage_opposition'|trans }}</div>
+                    </div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success"></i>
+                        <span class="trend-value">+0.1%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Counters Section -->
+    <div class="counters-section mb-4">
+        <div class="row g-4">
+            {% set counter_icons = {
+                'regions': 'fas fa-map-marked-alt',
+                'circles': 'fas fa-circle',
+                'communes': 'fas fa-city',
+                'civil_centers': 'fas fa-building',
+                'declaration_centers': 'fas fa-clipboard-list',
+                'tribunals': 'fas fa-gavel'
+            } %}
+            
+            {% for key, count in data.counters %}
+            <div class="col-xl-2 col-md-4 col-sm-6">
+                <div class="counter-card">
+                    <div class="counter-icon">
+                        <i class="{{ counter_icons[key] }}"></i>
+                    </div>
+                    <div class="counter-content">
+                        <div class="counter-value">{{ count }}</div>
+                        <div class="counter-label">{{ ('dashboard.charts.' ~ key)|trans }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Main Content Row -->
+    <div class="row g-4">
+        <!-- Interactive Map -->
+        <div class="col-xl-8">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-map me-2"></i>{{ 'dashboard.interactive_map'|trans }}
+                    </h5>
+                    <div class="card-tools">
+                        <button class="btn btn-sm btn-outline-primary" id="refreshMap">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="cameroonMap" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Panel -->
+        <div class="col-xl-4">
+            <div class="row g-4">
+                <!-- Recent Requests -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">{{ 'dashboard.recent_requests'|trans }}</h6>
+                            <a href="{{ path('admin_requests') }}" class="btn btn-sm btn-outline-primary">
+                                {{ 'buttons.view_all'|trans }}
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for request in data.recent_requests %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="ms-2 me-auto">
+                                            <div class="fw-bold">{{ request.reference }}</div>
+                                            <small class="text-muted">{{ request.citizen_name }} - {{ request.type }}</small>
+                                        </div>
+                                        <span class="badge bg-{{ request.status == 'completed' ? 'success' : (request.status == 'pending' ? 'warning' : 'primary') }} rounded-pill">
+                                            {{ request.status|title }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">{{ request.created_at|date('M d, H:i') }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending by Administration -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0">{{ 'dashboard.pending_by_administration'|trans }}</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="pendingByAdminChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Row -->
+    <div class="row g-4 mt-4">
+        <!-- Birth Rate Chart -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">{{ 'dashboard.charts.birth_rate'|trans }}</h6>
+                    <div class="card-tools">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="birthRatePeriod" id="birthRate6m" checked>
+                            <label class="btn btn-outline-secondary" for="birthRate6m">6M</label>
+                            
+                            <input type="radio" class="btn-check" name="birthRatePeriod" id="birthRate1y">
+                            <label class="btn btn-outline-secondary" for="birthRate1y">1Y</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="birthRateChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Missing Births Chart -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">{{ 'dashboard.charts.missing_births'|trans }}</h6>
+                    <div class="card-tools">
+                        <div class="btn-group btn-group-sm" role="group">
+                            <input type="radio" class="btn-check" name="missingBirthsPeriod" id="missingBirths6m" checked>
+                            <label class="btn btn-outline-secondary" for="missingBirths6m">6M</label>
+                            
+                            <input type="radio" class="btn-check" name="missingBirthsPeriod" id="missingBirths1y">
+                            <label class="btn btn-outline-secondary" for="missingBirths1y">1Y</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="missingBirthsChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Additional Statistics -->
+    <div class="row g-4 mt-4">
+        <!-- Pending by Citizens -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">{{ 'dashboard.pending_by_citizens'|trans }}</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="pendingByCitizensChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Health -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">{{ 'system.system_health'|trans }}</h6>
+                    <div class="card-tools">
+                        <span class="badge bg-success">{{ 'status.operational'|trans }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="health-metric">
+                                <div class="metric-label">CPU Usage</div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" style="width: 45%"></div>
+                                </div>
+                                <div class="metric-value">45%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="health-metric">
+                                <div class="metric-label">Memory</div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" style="width: 78%"></div>
+                                </div>
+                                <div class="metric-value">78%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="health-metric">
+                                <div class="metric-label">Disk Space</div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 32%"></div>
+                                </div>
+                                <div class="metric-value">32%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="health-metric">
+                                <div class="metric-label">Response Time</div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                </div>
+                                <div class="metric-value">0.8s</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Dashboard
+    initializeDashboard();
+    
+    // Initialize Charts
+    initializeCharts();
+    
+    // Initialize Map
+    initializeMap();
+    
+    // Event Listeners
+    document.getElementById('dashboardFilters').addEventListener('submit', handleFilterSubmit);
+    document.getElementById('resetFilters').addEventListener('click', resetFilters);
+    document.getElementById('refreshMap').addEventListener('click', refreshMap);
+});
+
+function initializeDashboard() {
+    console.log('Dashboard initialized');
+}
+
+function initializeCharts() {
+    // Birth Rate Chart
+    const birthRateCtx = document.getElementById('birthRateChart').getContext('2d');
+    new Chart(birthRateCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Birth Declarations %',
+                data: [23.26, 25.1, 22.8, 28.3, 24.7, 26.5, 25.9, 27.2, 23.8, 25.4, 24.1, 26.8],
+                borderColor: 'rgb(255, 159, 64)',
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 35
+                }
+            }
+        }
+    });
+    
+    // Missing Births Chart
+    const missingBirthsCtx = document.getElementById('missingBirthsChart').getContext('2d');
+    new Chart(missingBirthsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Missing Births %',
+                data: [16.98, 15.2, 18.4, 14.7, 17.3, 16.1, 15.8, 17.9, 16.5, 15.3, 17.8, 16.2],
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 20
+                }
+            }
+        }
+    });
+    
+    // Pending by Administration Chart
+    const pendingAdminCtx = document.getElementById('pendingByAdminChart').getContext('2d');
+    new Chart(pendingAdminCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['DGSN', 'Ministry of Justice', 'Civil Registry', 'Prefecture'],
+            datasets: [{
+                data: [45, 23, 67, 12],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 205, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Pending by Citizens Chart
+    const pendingCitizensCtx = document.getElementById('pendingByCitizensChart').getContext('2d');
+    new Chart(pendingCitizensCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Missing Documents', 'Payment Pending', 'Information Required', 'Appointment Needed'],
+            datasets: [{
+                data: [89, 34, 56, 23],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 205, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function initializeMap() {
+    // Initialize Leaflet map
+    const map = L.map('cameroonMap').setView([7.3697, 12.3547], 6);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    
+    // Add markers for regions
+    const regions = [
+        { name: 'Centre', lat: 3.8480, lng: 11.5021, requests: 1250 },
+        { name: 'Littoral', lat: 4.0511, lng: 9.7043, requests: 2100 },
+        { name: 'Nord', lat: 7.3275, lng: 13.3846, requests: 890 },
+        { name: 'Ouest', lat: 5.4698, lng: 10.2661, requests: 1450 },
+        { name: 'Sud', lat: 2.9283, lng: 11.5564, requests: 750 }
+    ];
+    
+    regions.forEach(region => {
+        const marker = L.marker([region.lat, region.lng]).addTo(map);
+        marker.bindPopup(`
+            <strong>${region.name}</strong><br>
+            Total Requests: ${region.requests}<br>
+            <small>Click for details</small>
+        `);
+    });
+}
+
+function handleFilterSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const params = new URLSearchParams(formData);
+    
+    // Reload page with new filters
+    window.location.search = params.toString();
+}
+
+function resetFilters() {
+    window.location.href = window.location.pathname;
+}
+
+function refreshMap() {
+    // Refresh map data
+    console.log('Refreshing map data...');
+}
+</script>
+{% endblock %}

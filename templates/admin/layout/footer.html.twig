@@ -1,0 +1,51 @@
+<footer class="main-footer">
+    <div class="footer-content">
+        <div class="footer-left">
+            <p class="footer-text">
+                &copy; {{ 'now'|date('Y') }} <strong>MK Gov Backoffice</strong> - 
+                {{ 'footer.all_rights_reserved'|trans }}
+            </p>
+            <p class="footer-text small text-muted">
+                {{ 'footer.government_portal'|trans }} - 
+                {{ 'footer.version'|trans }} 1.0.0
+            </p>
+        </div>
+        
+        <div class="footer-center">
+            <div class="footer-links">
+                <a href="#" class="footer-link">{{ 'footer.privacy_policy'|trans }}</a>
+                <span class="separator">|</span>
+                <a href="#" class="footer-link">{{ 'footer.terms_of_service'|trans }}</a>
+                <span class="separator">|</span>
+                <a href="#" class="footer-link">{{ 'footer.support'|trans }}</a>
+                <span class="separator">|</span>
+                <a href="#" class="footer-link">{{ 'footer.contact'|trans }}</a>
+            </div>
+        </div>
+        
+        <div class="footer-right">
+            <div class="system-info">
+                <div class="info-item">
+                    <i class="fas fa-server text-success"></i>
+                    <span class="info-text">{{ 'footer.server_status'|trans }}: Online</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="info-text">{{ 'now'|date('Y-m-d H:i:s') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Technical Information Bar (Development Mode) -->
+    {% if app.environment == 'dev' %}
+    <div class="tech-info-bar">
+        <div class="tech-info">
+            <span class="badge bg-secondary">DEV</span>
+            <span class="tech-item">Symfony {{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}</span>
+            <span class="tech-item">PHP {{ constant('PHP_VERSION') }}</span>
+            <span class="tech-item">Memory: {{ (memory_get_usage(true)/1024/1024)|round(1) }}MB</span>
+        </div>
+    </div>
+    {% endif %}
+</footer>

@@ -1,0 +1,140 @@
+<aside class="sidebar">
+    <!-- Logo -->
+    <div class="sidebar-header">
+        <div class="logo">
+            <img src="{{ asset('images/mk-gov-logo.png') }}" alt="MK Gov" class="logo-img">
+            <span class="logo-text">MK Gov</span>
+        </div>
+        <button class="sidebar-toggle d-lg-none" type="button">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <!-- User Info -->
+    <div class="user-info">
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+            <div class="user-name">{{ app.session.get('authenticated_user').name ?? 'Administrator' }}</div>
+            <div class="user-role">{{ app.session.get('authenticated_user').role|title ?? 'Admin' }}</div>
+        </div>
+        <div class="user-status">
+            <span class="status-indicator online"></span>
+        </div>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <ul class="nav-list">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a href="{{ path('admin_dashboard') }}" class="nav-link {{ app.request.get('_route') starts with 'admin_dashboard' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <span class="nav-text">{{ 'nav.dashboard'|trans }}</span>
+                </a>
+            </li>
+            
+            <!-- Requests -->
+            <li class="nav-item">
+                <a href="{{ path('admin_requests') }}" class="nav-link {{ app.request.get('_route') starts with 'admin_requests' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-file-alt"></i>
+                    <span class="nav-text">{{ 'nav.requests'|trans }}</span>
+                    <span class="nav-badge badge bg-warning">12</span>
+                </a>
+            </li>
+            
+            <!-- Procedures & Workflows -->
+            <li class="nav-item has-submenu">
+                <a href="#" class="nav-link submenu-toggle {{ app.request.get('_route') starts with 'admin_procedures' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-project-diagram"></i>
+                    <span class="nav-text">{{ 'nav.procedures'|trans }}</span>
+                    <i class="nav-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="{{ path('admin_procedures') }}" class="nav-link">{{ 'procedures.list_title'|trans }}</a></li>
+                    <li><a href="{{ path('admin_procedures_new') }}" class="nav-link">{{ 'procedures.new_procedure'|trans }}</a></li>
+                </ul>
+            </li>
+            
+            <!-- Documents -->
+            <li class="nav-item has-submenu">
+                <a href="#" class="nav-link submenu-toggle {{ app.request.get('_route') starts with 'admin_documents' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-folder-open"></i>
+                    <span class="nav-text">{{ 'nav.documents'|trans }}</span>
+                    <i class="nav-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="{{ path('admin_documents') }}" class="nav-link">{{ 'documents.list_title'|trans }}</a></li>
+                    <li><a href="{{ path('admin_documents_new') }}" class="nav-link">{{ 'documents.new_document'|trans }}</a></li>
+                </ul>
+            </li>
+            
+            <!-- User Management -->
+            <li class="nav-item has-submenu">
+                <a href="#" class="nav-link submenu-toggle {{ app.request.get('_route') starts with 'admin_users' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-users"></i>
+                    <span class="nav-text">{{ 'nav.users'|trans }}</span>
+                    <i class="nav-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="{{ path('admin_users') }}" class="nav-link">{{ 'users.list_title'|trans }}</a></li>
+                    <li><a href="{{ path('admin_users_new') }}" class="nav-link">{{ 'users.new_user'|trans }}</a></li>
+                </ul>
+            </li>
+            
+            <!-- Public Entities -->
+            <li class="nav-item has-submenu">
+                <a href="#" class="nav-link submenu-toggle {{ app.request.get('_route') starts with 'admin_public_entities' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-building"></i>
+                    <span class="nav-text">{{ 'nav.public_entities'|trans }}</span>
+                    <i class="nav-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="{{ path('admin_public_entities') }}" class="nav-link">{{ 'public_entities.list_title'|trans }}</a></li>
+                    <li><a href="{{ path('admin_public_entities_new') }}" class="nav-link">{{ 'public_entities.new_entity'|trans }}</a></li>
+                </ul>
+            </li>
+            
+            <!-- System -->
+            <li class="nav-item has-submenu">
+                <a href="#" class="nav-link submenu-toggle {{ app.request.get('_route') starts with 'admin_system' ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-cogs"></i>
+                    <span class="nav-text">{{ 'nav.system'|trans }}</span>
+                    <i class="nav-arrow fas fa-chevron-right"></i>
+                </a>
+                <ul class="nav-submenu">
+                    <li><a href="{{ path('admin_system_settings') }}" class="nav-link">{{ 'system.settings'|trans }}</a></li>
+                    <li><a href="{{ path('admin_system_reference_data') }}" class="nav-link">{{ 'system.reference_data'|trans }}</a></li>
+                    <li><a href="{{ path('admin_system_logs') }}" class="nav-link">{{ 'system.logs'|trans }}</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <div class="system-status">
+            <div class="status-item">
+                <i class="fas fa-circle text-success"></i>
+                <span>System Online</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-database"></i>
+                <span>DB Connected</span>
+            </div>
+        </div>
+        
+        <div class="footer-actions">
+            <a href="#" class="btn btn-sm btn-outline-light" title="{{ 'help.user_guide'|trans }}">
+                <i class="fas fa-question-circle"></i>
+            </a>
+            <a href="{{ path('admin_logout') }}" class="btn btn-sm btn-outline-light" title="{{ 'nav.logout'|trans }}">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay d-lg-none"></div>

@@ -1,0 +1,184 @@
+# translations/messages.en.yaml
+
+# Global Navigation
+nav:
+    dashboard: Dashboard
+    requests: Requests
+    procedures: Procedures & Workflows
+    documents: Documents
+    users: User Management
+    public_entities: Public Entities
+    system: System
+    logout: Logout
+    profile: Profile
+
+# Dashboard
+dashboard:
+    title: Dashboard
+    overview: Overview
+    statistics: Statistics
+    recent_requests: Recent Requests
+    pending_requests: Pending Requests
+    completed_requests: Completed Requests
+    total_users: Total Users
+    active_procedures: Active Procedures
+    filters:
+        region: Filter by Region
+        service_family: Filter by Service Family
+        request_status: Filter by Request Status
+        year: Filter by Year
+        all: All
+    charts:
+        birth_rate: Birth Declaration Rate
+        missing_births: Missing Birth Percentage
+        supplementary_judgments: Supplementary Judgment Requests
+        marriage_opposition: Marriage Opposition Rate
+        regions: Regions
+        circles: Circles
+        communes: Communes
+        civil_centers: Civil Status Centers
+        declaration_centers: Declaration Centers
+        tribunals: Tribunals
+
+# Requests Management
+requests:
+    title: Requests Management
+    list_title: Requests List
+    new_request: New Request
+    edit_request: Edit Request
+    show_request: View Request
+    delete_request: Delete Request
+    search_placeholder: Search requests...
+    filters:
+        all_statuses: All Statuses
+        pending: Pending
+        in_progress: In Progress
+        completed: Completed
+        rejected: Rejected
+    columns:
+        id: ID
+        reference: Reference
+        type: Type
+        citizen: Citizen
+        status: Status
+        created_at: Created Date
+        updated_at: Updated Date
+        actions: Actions
+    statuses:
+        draft: Draft
+        submitted: Submitted
+        under_review: Under Review
+        approved: Approved
+        rejected: Rejected
+        completed: Completed
+    actions:
+        view: View
+        edit: Edit
+        delete: Delete
+        approve: Approve
+        reject: Reject
+
+# Procedures Management
+procedures:
+    title: Procedures & Workflows
+    list_title: Procedures List
+    new_procedure: New Procedure
+    edit_procedure: Edit Procedure
+    show_procedure: View Procedure
+    delete_procedure: Delete Procedure
+    workflow_steps: Workflow Steps
+    required_documents: Required Documents
+    processing_time: Processing Time
+    cost: Cost
+    responsible_entity: Responsible Entity
+
+# Documents Management
+documents:
+    title: Documents Management
+    list_title: Documents List
+    new_document: New Document
+    edit_document: Edit Document
+    show_document: View Document
+    delete_document: Delete Document
+    template_management: Template Management
+    document_types: Document Types
+    upload_document: Upload Document
+
+# User Management
+users:
+    title: User Management
+    list_title: Users List
+    new_user: New User
+    edit_user: Edit User
+    show_user: View User
+    delete_user: Delete User
+    roles_permissions: Roles & Permissions
+    user_roles: User Roles
+    permissions: Permissions
+    active_users: Active Users
+    inactive_users: Inactive Users
+
+# Public Entities
+public_entities:
+    title: Public Entities
+    list_title: Public Entities List
+    new_entity: New Entity
+    edit_entity: Edit Entity
+    show_entity: View Entity
+    delete_entity: Delete Entity
+    entity_type: Entity Type
+    contact_information: Contact Information
+    services_offered: Services Offered
+
+# System Management
+system:
+    title: System Management
+    settings: Settings
+    reference_data: Reference Data
+    logs: System Logs
+    configuration: Configuration
+    maintenance: Maintenance
+    backup: Backup & Restore
+    system_health: System Health
+
+# Forms
+forms:
+    save: Save
+    cancel: Cancel
+    delete: Delete
+    confirm: Confirm
+    submit: Submit
+    reset: Reset
+    search: Search
+    filter: Filter
+    export: Export
+    import: Import
+    required_field: Required field
+    optional_field: Optional field
+
+# Messages
+messages:
+    success:
+        created: Item created successfully
+        updated: Item updated successfully
+        deleted: Item deleted successfully
+        saved: Changes saved successfully
+    error:
+        general: An error occurred
+        not_found: Item not found
+        access_denied: Access denied
+        validation_failed: Validation failed
+    confirm:
+        delete: Are you sure you want to delete this item?
+        action: Are you sure you want to perform this action?
+
+# Status Labels
+status:
+    active: Active
+    inactive: Inactive
+    enabled: Enabled
+    disabled: Disabled
+    public: Public
+    private: Private
+    draft: Draft
+    published: Published

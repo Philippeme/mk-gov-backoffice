@@ -1,0 +1,9 @@
+framework:
+    translator:
+        default_locale: en
+        fallbacks:
+            - en
+        providers:
+            - translation.provider.doctrine
+        paths:
+            - '%kernel.project_dir%/translations'

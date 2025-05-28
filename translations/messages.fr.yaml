@@ -1,0 +1,184 @@
+# translations/messages.fr.yaml
+
+# Navigation Globale
+nav:
+    dashboard: Tableau de Bord
+    requests: Demandes
+    procedures: Procédures & Workflows
+    documents: Documents
+    users: Gestion des Utilisateurs
+    public_entities: Entités Publiques
+    system: Système
+    logout: Déconnexion
+    profile: Profil
+
+# Tableau de Bord
+dashboard:
+    title: Tableau de Bord
+    overview: Vue d'ensemble
+    statistics: Statistiques
+    recent_requests: Demandes Récentes
+    pending_requests: Demandes en Attente
+    completed_requests: Demandes Complétées
+    total_users: Total Utilisateurs
+    active_procedures: Procédures Actives
+    filters:
+        region: Filtrer par Région
+        service_family: Filtrer par Famille de Services
+        request_status: Filtrer par Statut de Demande
+        year: Filtrer par Année
+        all: Tous
+    charts:
+        birth_rate: Taux de Déclarations de Naissances
+        missing_births: Pourcentage de Naissances Manquées
+        supplementary_judgments: Demandes de Jugements Supplétifs
+        marriage_opposition: Taux d'Opposition au Mariage
+        regions: Régions
+        circles: Cercles
+        communes: Communes
+        civil_centers: Centres d'État Civil
+        declaration_centers: Centres de Déclaration
+        tribunals: Tribunaux
+
+# Gestion des Demandes
+requests:
+    title: Gestion des Demandes
+    list_title: Liste des Demandes
+    new_request: Nouvelle Demande
+    edit_request: Modifier la Demande
+    show_request: Voir la Demande
+    delete_request: Supprimer la Demande
+    search_placeholder: Rechercher des demandes...
+    filters:
+        all_statuses: Tous les Statuts
+        pending: En Attente
+        in_progress: En Cours
+        completed: Complétée
+        rejected: Rejetée
+    columns:
+        id: ID
+        reference: Référence
+        type: Type
+        citizen: Citoyen
+        status: Statut
+        created_at: Date de Création
+        updated_at: Date de Mise à Jour
+        actions: Actions
+    statuses:
+        draft: Brouillon
+        submitted: Soumise
+        under_review: En Révision
+        approved: Approuvée
+        rejected: Rejetée
+        completed: Complétée
+    actions:
+        view: Voir
+        edit: Modifier
+        delete: Supprimer
+        approve: Approuver
+        reject: Rejeter
+
+# Gestion des Procédures
+procedures:
+    title: Procédures & Workflows
+    list_title: Liste des Procédures
+    new_procedure: Nouvelle Procédure
+    edit_procedure: Modifier la Procédure
+    show_procedure: Voir la Procédure
+    delete_procedure: Supprimer la Procédure
+    workflow_steps: Étapes du Workflow
+    required_documents: Documents Requis
+    processing_time: Temps de Traitement
+    cost: Coût
+    responsible_entity: Entité Responsable
+
+# Gestion des Documents
+documents:
+    title: Gestion des Documents
+    list_title: Liste des Documents
+    new_document: Nouveau Document
+    edit_document: Modifier le Document
+    show_document: Voir le Document
+    delete_document: Supprimer le Document
+    template_management: Gestion des Modèles
+    document_types: Types de Documents
+    upload_document: Télécharger un Document
+
+# Gestion des Utilisateurs
+users:
+    title: Gestion des Utilisateurs
+    list_title: Liste des Utilisateurs
+    new_user: Nouvel Utilisateur
+    edit_user: Modifier l'Utilisateur
+    show_user: Voir l'Utilisateur
+    delete_user: Supprimer l'Utilisateur
+    roles_permissions: Rôles & Permissions
+    user_roles: Rôles Utilisateur
+    permissions: Permissions
+    active_users: Utilisateurs Actifs
+    inactive_users: Utilisateurs Inactifs
+
+# Entités Publiques
+public_entities:
+    title: Entités Publiques
+    list_title: Liste des Entités Publiques
+    new_entity: Nouvelle Entité
+    edit_entity: Modifier l'Entité
+    show_entity: Voir l'Entité
+    delete_entity: Supprimer l'Entité
+    entity_type: Type d'Entité
+    contact_information: Informations de Contact
+    services_offered: Services Offerts
+
+# Gestion du Système
+system:
+    title: Gestion du Système
+    settings: Paramètres
+    reference_data: Données de Référence
+    logs: Journaux Système
+    configuration: Configuration
+    maintenance: Maintenance
+    backup: Sauvegarde & Restauration
+    system_health: Santé du Système
+
+# Formulaires
+forms:
+    save: Enregistrer
+    cancel: Annuler
+    delete: Supprimer
+    confirm: Confirmer
+    submit: Soumettre
+    reset: Réinitialiser
+    search: Rechercher
+    filter: Filtrer
+    export: Exporter
+    import: Importer
+    required_field: Champ obligatoire
+    optional_field: Champ optionnel
+
+# Messages
+messages:
+    success:
+        created: Élément créé avec succès
+        updated: Élément mis à jour avec succès
+        deleted: Élément supprimé avec succès
+        saved: Modifications enregistrées avec succès
+    error:
+        general: Une erreur s'est produite
+        not_found: Élément introuvable
+        access_denied: Accès refusé
+        validation_failed: Validation échouée
+    confirm:
+        delete: Êtes-vous sûr de vouloir supprimer cet élément ?
+        action: Êtes-vous sûr de vouloir effectuer cette action ?
+
+# Libellés de Statut
+status:
+    active: Actif
+    inactive: Inactif
+    enabled: Activé
+    disabled: Désactivé
+    public: Public
+    private: Privé
+    draft: Brouillon
+    published: Publié
