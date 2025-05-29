@@ -1,0 +1,714 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block title %}{{ 'public_entities.title'|trans }} - MK Gov Backoffice{% endblock %}
+
+{% block page_title %}{{ 'public_entities.title'|trans }}{% endblock %}
+
+{% block page_subtitle %}
+    <p class="text-muted mb-0">{{ 'public_entities.list_title'|trans }}</p>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">{{ 'nav.dashboard'|trans }}</a></li>
+        <li class="breadcrumb-item active">{{ 'nav.public_entities'|trans }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="public-entities-container">
+    <!-- Filters and Actions Bar -->
+    <div class="filters-actions-bar mb-4">
+        <div class="card">
+            <div class="card-body py-3">
+                <div class="row align-items-center">
+                    <div class="col-md-7">
+                        <form method="GET" class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" name="search" class="form-control" 
+                                           placeholder="Search entities..." 
+                                           value="{{ filters.search }}">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="type" class="form-select">
+                                    {% for key, type in entity_types %}
+                                    <option value="{{ key }}" {{ filters.type == key ? 'selected' : '' }}>
+                                        {{ type }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="region" class="form-select">
+                                    {% for key, region in regions %}
+                                    <option value="{{ key }}" {{ filters.region == key ? 'selected' : '' }}>
+                                        {{ region }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="status" class="form-select">
+                                    {% for key, status in statuses %}
+                                    <option value="{{ key }}" {{ filters.status == key ? 'selected' : '' }}>
+                                        {{ status }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-5 text-end">
+                        <a href="{{ path('admin_public_entities_new') }}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>{{ 'public_entities.new_entity'|trans }}
+                        </a>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#mapViewModal">
+                            <i class="fas fa-map-marked-alt me-2"></i>Map View
+                        </button>
+                        <button class="btn btn-outline-secondary" data-bs-toggle="offcanvas" data-bs-target="#entityStats">
+                            <i class="fas fa-chart-bar me-2"></i>Statistics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="statistics-cards mb-4">
+        <div class="row g-3">
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ pagination.total_items }}</div>
+                        <div class="stat-label">Total Entities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">{{ pagination.total_items - 5 }}</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Ministries</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">25</div>
+                        <div class="stat-label">Offices</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card orange">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">487</div>
+                        <div class="stat-label">Staff</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4">
+                <div class="stat-card gray">
+                    <div class="stat-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Regions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entities Grid -->
+    <div class="entities-grid">
+        <div class="row g-4">
+            {% for entity in entities %}
+            <div class="col-xl-6">
+                <div class="entity-card">
+                    <div class="entity-header">
+                        <div class="entity-info">
+                            <div class="entity-icon">
+                                <i class="fas fa-{{ entity.type == 'ministry' ? 'university' : (entity.type == 'prefecture' ? 'landmark' : 'building') }} text-primary"></i>
+                            </div>
+                            <div class="entity-details">
+                                <h5 class="entity-name">{{ entity.name }}</h5>
+                                <div class="entity-meta">
+                                    <span class="badge bg-{{ entity.type == 'ministry' ? 'danger' : (entity.type == 'prefecture' ? 'warning' : 'info') }}">
+                                        {{ entity.type|replace({'_': ' '})|title }}
+                                    </span>
+                                    <span class="text-muted">{{ entity.code }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="entity-status">
+                            <span class="badge bg-{{ entity.status == 'active' ? 'success' : 'secondary' }}">
+                                {{ entity.status|title }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="entity-body">
+                        <div class="entity-location">
+                            <div class="location-item">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <span>{{ entity.region }}, {{ entity.commune }}</span>
+                            </div>
+                            <div class="location-item">
+                                <i class="fas fa-home text-info"></i>
+                                <span>{{ entity.address }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="entity-contact">
+                            <div class="contact-item">
+                                <i class="fas fa-phone text-success"></i>
+                                <span>{{ entity.phone }}</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope text-primary"></i>
+                                <span>{{ entity.email }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="entity-stats">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <div class="stat-mini">
+                                        <div class="stat-mini-value">{{ entity.staff_count }}</div>
+                                        <div class="stat-mini-label">Staff</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-mini">
+                                        <div class="stat-mini-value">{{ entity.services_count }}</div>
+                                        <div class="stat-mini-label">Services</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stat-mini">
+                                        <div class="stat-mini-value">{{ entity.director|slice(0, 8) }}...</div>
+                                        <div class="stat-mini-label">Director</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="entity-footer">
+                        <div class="entity-dates">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-plus me-1"></i>{{ entity.created_at|date('M d, Y') }} • 
+                                <i class="fas fa-edit me-1"></i>{{ entity.updated_at|date('M d, Y') }}
+                            </small>
+                        </div>
+                        <div class="entity-actions">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ path('admin_public_entities_show', {id: entity.id}) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ path('admin_public_entities_edit', {id: entity.id}) }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-outline-info" onclick="showOnMap({{ entity.id }})">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteEntity({{ entity.id }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No public entities found</h5>
+                    <p class="text-muted">Create your first public entity to get started with entity management.</p>
+                    <a href="{{ path('admin_public_entities_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create New Entity
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.total_pages > 1 %}
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Entities pagination">
+            <ul class="pagination">
+                {% if pagination.current_page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pagination.current_page - 1 }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                
+                {% for page in 1..pagination.total_pages %}
+                    {% if page == pagination.current_page %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page }}</span>
+                    </li>
+                    {% elseif page <= pagination.current_page + 2 and page >= pagination.current_page - 2 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if pagination.current_page < pagination.total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ pagination.current_page + 1 }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Map View Modal -->
+<div class="modal fade" id="mapViewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-map-marked-alt me-2"></i>Public Entities Map View
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="entitiesMap" style="height: 500px; width: 100%;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="exportMapData()">
+                    <i class="fas fa-download me-2"></i>Export Locations
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Offcanvas -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="entityStats">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Entity Statistics</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="stats-section">
+            <h6>By Type</h6>
+            <canvas id="entityTypeChart" height="200"></canvas>
+        </div>
+        
+        <div class="stats-section mt-4">
+            <h6>By Region</h6>
+            <div class="region-stats">
+                <div class="region-stat-item">
+                    <span class="region-name">Centre</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width: 35%"></div>
+                    </div>
+                    <span class="region-count">23</span>
+                </div>
+                <div class="region-stat-item">
+                    <span class="region-name">Littoral</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 28%"></div>
+                    </div>
+                    <span class="region-count">18</span>
+                </div>
+                <div class="region-stat-item">
+                    <span class="region-name">Ouest</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 20%"></div>
+                    </div>
+                    <span class="region-count">13</span>
+                </div>
+                <div class="region-stat-item">
+                    <span class="region-name">Nord</span>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: 17%"></div>
+                    </div>
+                    <span class="region-count">11</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-section mt-4">
+            <h6>Performance Metrics</h6>
+            <div class="metric-item">
+                <span class="metric-label">Average Staff per Entity</span>
+                <span class="metric-value">7.2</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Average Services per Entity</span>
+                <span class="metric-value">4.8</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Entities with Website</span>
+                <span class="metric-value">45%</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Entities with Email</span>
+                <span class="metric-value">89%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteEntityModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Entity Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h5>Are you sure you want to delete this entity?</h5>
+                    <p class="text-muted">This action cannot be undone. All entity data, staff, and services will be permanently removed.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteEntity">
+                    <i class="fas fa-trash me-2"></i>Delete Entity
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let entityToDelete = null;
+    let entitiesMap = null;
+    
+    // Initialize statistics chart
+    initializeStatsChart();
+    
+    // Delete entity function
+    window.deleteEntity = function(entityId) {
+        entityToDelete = entityId;
+        new bootstrap.Modal(document.getElementById('deleteEntityModal')).show();
+    };
+    
+    // Show entity on map
+    window.showOnMap = function(entityId) {
+        // This would show the specific entity on the map
+        new bootstrap.Modal(document.getElementById('mapViewModal')).show();
+        setTimeout(() => {
+            initializeMap();
+        }, 500);
+    };
+    
+    // Confirm delete
+    document.getElementById('confirmDeleteEntity').addEventListener('click', function() {
+        if (entityToDelete) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/public-entities/${entityToDelete}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+    
+    // Initialize map when modal is shown
+    document.getElementById('mapViewModal').addEventListener('shown.bs.modal', function() {
+        if (!entitiesMap) {
+            initializeMap();
+        }
+    });
+    
+    function initializeMap() {
+        entitiesMap = L.map('entitiesMap').setView([7.3697, 12.3547], 6);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(entitiesMap);
+        
+        // Add markers for entities
+        const entities = [
+            { name: 'Civil Registry Office - Yaoundé', lat: 3.8480, lng: 11.5021, type: 'civil_registry' },
+            { name: 'DGSN - Douala', lat: 4.0511, lng: 9.7043, type: 'security_service' },
+            { name: 'Prefecture du Wouri', lat: 4.0511, lng: 9.7043, type: 'prefecture' }
+        ];
+        
+        entities.forEach(entity => {
+            const icon = L.divIcon({
+                html: `<i class="fas fa-building text-primary"></i>`,
+                iconSize: [20, 20],
+                className: 'custom-div-icon'
+            });
+            
+            const marker = L.marker([entity.lat, entity.lng], { icon: icon }).addTo(entitiesMap);
+            marker.bindPopup(`
+                <strong>${entity.name}</strong><br>
+                Type: ${entity.type}<br>
+                <a href="#" onclick="viewEntityDetails()">View Details</a>
+            `);
+        });
+    }
+    
+    function initializeStatsChart() {
+        const ctx = document.getElementById('entityTypeChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Civil Registry', 'Security Services', 'Prefectures', 'Ministries', 'Others'],
+                datasets: [{
+                    data: [25, 12, 8, 15, 7],
+                    backgroundColor: [
+                        '#1a73e8',
+                        '#34a853',
+                        '#fbbc04',
+                        '#ea4335',
+                        '#9aa0a6'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Export map data
+    window.exportMapData = function() {
+        const mapData = {
+            entities: [
+                // Entity data would be populated here
+            ]
+        };
+        
+        const dataStr = JSON.stringify(mapData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'entities_locations.json';
+        link.click();
+        
+        URL.revokeObjectURL(url);
+    };
+});
+</script>
+
+<style>
+.entity-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.entity-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.entity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.entity-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.entity-icon {
+    font-size: 2rem;
+    margin-top: 0.25rem;
+}
+
+.entity-name {
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+.entity-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.entity-body {
+    padding: 1.5rem;
+    flex: 1;
+}
+
+.entity-location,
+.entity-contact {
+    margin-bottom: 1rem;
+}
+
+.location-item,
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.entity-stats {
+    margin-top: 1rem;
+}
+
+.stat-mini {
+    text-align: center;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+}
+
+.stat-mini-value {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.875rem;
+}
+
+.stat-mini-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+.entity-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats-section {
+    margin-bottom: 2rem;
+}
+
+.region-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.region-name {
+    min-width: 80px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.progress {
+    flex: 1;
+    height: 6px;
+}
+
+.region-count {
+    min-width: 30px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.metric-item:last-child {
+    border-bottom: none;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.metric-value {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.custom-div-icon {
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}

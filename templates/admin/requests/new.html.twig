@@ -1,0 +1,464 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block title %}{{ 'requests.new_request'|trans }} - MK Gov Backoffice{% endblock %}
+
+{% block page_title %}{{ 'requests.new_request'|trans }}{% endblock %}
+
+{% block page_subtitle %}
+    <p class="text-muted mb-0">Create a new citizen service request</p>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">{{ 'nav.dashboard'|trans }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('admin_requests') }}">{{ 'nav.requests'|trans }}</a></li>
+        <li class="breadcrumb-item active">{{ 'requests.new_request'|trans }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="new-request-container">
+    <form method="POST" enctype="multipart/form-data" id="newRequestForm">
+        <div class="row g-4">
+            <!-- Main Form -->
+            <div class="col-xl-8">
+                <!-- Request Type Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-clipboard-list me-2"></i>Request Type Selection
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label required">Service Type</label>
+                                <select name="request_type" id="requestType" class="form-select" required>
+                                    <option value="">Select a service type...</option>
+                                    {% for key, type in request_types %}
+                                        {% if key != 'all' %}
+                                        <option value="{{ key }}" data-category="{{ type.category ?? 'general' }}" 
+                                                data-processing-time="{{ type.processing_time ?? '3-5 days' }}"
+                                                data-cost="{{ type.cost ?? 0 }}">
+                                            {{ type }}
+                                        </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Select the type of service the citizen is requesting</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Service Category</label>
+                                <input type="text" id="serviceCategory" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estimated Processing Time</label>
+                                <input type="text" id="processingTime" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Citizen Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user me-2"></i>Citizen Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">First Name</label>
+                                <input type="text" name="citizen_first_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Last Name</label>
+                                <input type="text" name="citizen_last_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">Email Address</label>
+                                <input type="email" name="citizen_email" class="form-control" required>
+                                <div class="form-text">Notifications will be sent to this email</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="citizen_phone" class="form-control" placeholder="+237 6XX XXX XXX">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" name="citizen_birth_date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nationality</label>
+                                <select name="citizen_nationality" class="form-select">
+                                    <option value="">Select nationality...</option>
+                                    <option value="cameroonian" selected>Cameroonian</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea name="citizen_address" class="form-control" rows="2" 
+                                          placeholder="Full residential address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Details -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-file-alt me-2"></i>Request Details
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required">Priority Level</label>
+                                <select name="priority" class="form-select" required>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Preferred Collection Date</label>
+                                <input type="date" name="preferred_date" class="form-control" 
+                                       min="{{ 'now'|date('Y-m-d') }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Request Description</label>
+                                <textarea name="description" class="form-control" rows="4" 
+                                          placeholder="Provide additional details about this request..."></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Reason for Request</label>
+                                <select name="request_reason" class="form-select">
+                                    <option value="">Select reason...</option>
+                                    <option value="first_time">First time application</option>
+                                    <option value="replacement">Replacement (lost/damaged)</option>
+                                    <option value="renewal">Renewal</option>
+                                    <option value="correction">Correction/Amendment</option>
+                                    <option value="duplicate">Duplicate copy</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Number of Copies</label>
+                                <input type="number" name="copies_requested" class="form-control" 
+                                       value="1" min="1" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Upload -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-paperclip me-2"></i>Required Documents
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="upload-section">
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-icon">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted"></i>
+                                </div>
+                                <div class="upload-text">
+                                    <h6>Drag and drop files here or click to browse</h6>
+                                    <p class="text-muted">Accepted formats: PDF, JPG, PNG (Max 5MB per file)</p>
+                                </div>
+                                <input type="file" id="fileInput" name="documents[]" multiple 
+                                       accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                            </div>
+                            <div id="fileList" class="file-list mt-3"></div>
+                        </div>
+                        
+                        <div class="required-docs-info mt-3">
+                            <h6>Typically Required Documents:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Valid Identity Card (both sides)</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Completed Application Form</li>
+                                <li><i class="fas fa-check-circle text-muted me-2"></i>Proof of Payment (if applicable)</li>
+                                <li><i class="fas fa-check-circle text-muted me-2"></i>Additional supporting documents</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user-cog me-2"></i>Assignment & Processing
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Assign to Entity</label>
+                                <select name="assigned_entity" class="form-select">
+                                    <option value="">Auto-assign based on service type</option>
+                                    {% for id, entity in public_entities %}
+                                    <option value="{{ id }}">{{ entity }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Initial Status</label>
+                                <select name="initial_status" class="form-select">
+                                    <option value="draft">Draft</option>
+                                    <option value="submitted" selected>Submitted</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Internal Notes</label>
+                                <textarea name="internal_notes" class="form-control" rows="3" 
+                                          placeholder="Internal notes for processing staff (not visible to citizen)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-xl-4">
+                <!-- Quick Actions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Form Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Request
+                            </button>
+                            <button type="submit" name="action" value="draft" class="btn btn-outline-secondary">
+                                <i class="fas fa-save me-2"></i>Save as Draft
+                            </button>
+                            <a href="{{ path('admin_requests') }}" class="btn btn-outline-danger">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Information -->
+                <div class="card mb-4" id="serviceInfoCard" style="display: none;">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Service Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="service-info">
+                            <div class="info-item">
+                                <span class="info-label">Processing Time:</span>
+                                <span id="serviceProcessingTime">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Service Fee:</span>
+                                <span id="serviceFee">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Responsible Entity:</span>
+                                <span id="responsibleEntity">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Validation -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">Form Validation</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="validation-checklist">
+                            <div class="check-item" data-field="request_type">
+                                <i class="fas fa-circle text-muted me-2"></i>
+                                <span>Service type selected</span>
+                            </div>
+                            <div class="check-item" data-field="citizen_info">
+                                <i class="fas fa-circle text-muted me-2"></i>
+                                <span>Citizen information complete</span>
+                            </div>
+                            <div class="check-item" data-field="documents">
+                                <i class="fas fa-circle text-muted me-2"></i>
+                                <span>Required documents uploaded</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const requestTypeSelect = document.getElementById('requestType');
+    const serviceInfoCard = document.getElementById('serviceInfoCard');
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    
+    let uploadedFiles = [];
+    
+    // Request type change handler
+    requestTypeSelect.addEventListener('change', function() {
+        const selectedOption = this.selectedOptions[0];
+        
+        if (selectedOption.value) {
+            const category = selectedOption.dataset.category || 'General';
+            const processingTime = selectedOption.dataset.processingTime || '3-5 days';
+            const cost = selectedOption.dataset.cost || '0';
+            
+            document.getElementById('serviceCategory').value = category;
+            document.getElementById('processingTime').value = processingTime;
+            
+            // Update service info card
+            document.getElementById('serviceProcessingTime').textContent = processingTime;
+            document.getElementById('serviceFee').textContent = cost > 0 ? cost + ' XAF' : 'Free';
+            document.getElementById('responsibleEntity').textContent = getResponsibleEntity(selectedOption.value);
+            
+            serviceInfoCard.style.display = 'block';
+            updateValidation('request_type', true);
+        } else {
+            serviceInfoCard.style.display = 'none';
+            updateValidation('request_type', false);
+        }
+    });
+    
+    // File upload handlers
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', handleDragOver);
+    uploadArea.addEventListener('drop', handleDrop);
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        const files = Array.from(e.dataTransfer.files);
+        addFiles(files);
+    }
+    
+    function handleFileSelect(e) {
+        const files = Array.from(e.target.files);
+        addFiles(files);
+    }
+    
+    function addFiles(files) {
+        files.forEach(file => {
+            if (validateFile(file)) {
+                uploadedFiles.push(file);
+                displayFile(file);
+            }
+        });
+        updateValidation('documents', uploadedFiles.length > 0);
+    }
+    
+    function validateFile(file) {
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type. Only PDF, JPG, and PNG files are allowed.');
+            return false;
+        }
+        
+        if (file.size > maxSize) {
+            alert('File too large. Maximum size is 5MB.');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    function displayFile(file) {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+            <div class="file-icon">
+                <i class="fas fa-file-${file.type.includes('pdf') ? 'pdf text-danger' : 'image text-primary'}"></i>
+            </div>
+            <div class="file-info">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatFileSize(file.size)}</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger remove-file" data-file-name="${file.name}">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        fileList.appendChild(fileItem);
+        
+        // Add remove handler
+        fileItem.querySelector('.remove-file').addEventListener('click', function() {
+            const fileName = this.dataset.fileName;
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            fileItem.remove();
+            updateValidation('documents', uploadedFiles.length > 0);
+        });
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function getResponsibleEntity(serviceType) {
+        const entities = {
+            'birth_certificate': 'Civil Registry Office',
+            'passport_application': 'DGSN',
+            'marriage_certificate': 'Civil Registry Office',
+            'driving_license': 'Ministry of Transport',
+            'business_registration': 'CFCE'
+        };
+        return entities[serviceType] || 'Auto-assigned';
+    }
+    
+    function updateValidation(field, isValid) {
+        const checkItem = document.querySelector(`[data-field="${field}"]`);
+        if (checkItem) {
+            const icon = checkItem.querySelector('i');
+            icon.className = isValid ? 'fas fa-check-circle text-success me-2' : 'fas fa-circle text-muted me-2';
+        }
+    }
+    
+    // Form validation
+    const form = document.getElementById('newRequestForm');
+    form.addEventListener('input', function(e) {
+        if (e.target.name === 'citizen_first_name' || e.target.name === 'citizen_last_name' || e.target.name === 'citizen_email') {
+            const firstName = form.citizen_first_name.value.trim();
+            const lastName = form.citizen_last_name.value.trim();
+            const email = form.citizen_email.value.trim();
+            
+            updateValidation('citizen_info', firstName && lastName && email);
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        // Add uploaded files to form data
+        const formData = new FormData(this);
+        uploadedFiles.forEach((file, index) => {
+            formData.append(`documents[${index}]`, file);
+        });
+    });
+});
+</script>
+{% endblock %}

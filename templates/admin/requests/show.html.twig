@@ -1,0 +1,526 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block title %}{{ request.reference }} - {{ 'requests.show_request'|trans }} - MK Gov Backoffice{% endblock %}
+
+{% block page_title %}{{ 'requests.show_request'|trans }}{% endblock %}
+
+{% block page_subtitle %}
+    <div class="d-flex align-items-center">
+        <span class="text-muted me-3">{{ request.reference }}</span>
+        <span class="badge bg-{{ request.status == 'completed' ? 'success' : (request.status == 'pending' ? 'warning' : (request.status == 'rejected' ? 'danger' : 'primary')) }} me-2">
+            {{ ('requests.statuses.' ~ request.status)|trans }}
+        </span>
+        <span class="badge bg-{{ request.priority == 'high' ? 'danger' : (request.priority == 'medium' ? 'warning' : 'info') }}">
+            {{ request.priority|title }} Priority
+        </span>
+    </div>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">{{ 'nav.dashboard'|trans }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('admin_requests') }}">{{ 'nav.requests'|trans }}</a></li>
+        <li class="breadcrumb-item active">{{ request.reference }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="request-details-container">
+    <!-- Action Bar -->
+    <div class="action-bar mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group" role="group">
+                <a href="{{ path('admin_requests') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{{ 'buttons.back_to_list'|trans }}
+                </a>
+                <a href="{{ path('admin_requests_edit', {id: request.id}) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i>{{ 'requests.actions.edit'|trans }}
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                {% if request.status == 'pending' or request.status == 'under_review' %}
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                    <i class="fas fa-check me-2"></i>{{ 'requests.actions.approve'|trans }}
+                </button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <i class="fas fa-times me-2"></i>{{ 'requests.actions.reject'|trans }}
+                </button>
+                {% endif %}
+                <button class="btn btn-outline-info" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>{{ 'buttons.print'|trans }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Request Information -->
+        <div class="col-xl-8">
+            <!-- Basic Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Request Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Reference Number</label>
+                                <div class="info-value">{{ request.reference }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Request Type</label>
+                                <div class="info-value">
+                                    <span class="badge bg-secondary fs-6">{{ request.type }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Current Status</label>
+                                <div class="info-value">
+                                    <span class="badge bg-{{ request.status == 'completed' ? 'success' : (request.status == 'pending' ? 'warning' : (request.status == 'rejected' ? 'danger' : 'primary')) }} fs-6">
+                                        {{ ('requests.statuses.' ~ request.status)|trans }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Priority Level</label>
+                                <div class="info-value">
+                                    <span class="badge bg-{{ request.priority == 'high' ? 'danger' : (request.priority == 'medium' ? 'warning' : 'info') }} fs-6">
+                                        {{ request.priority|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Assigned To</label>
+                                <div class="info-value">{{ request.assigned_to }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Assigned User</label>
+                                <div class="info-value">{{ request.assigned_user }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Created Date</label>
+                                <div class="info-value">{{ request.created_at|date('F d, Y \\a\\t H:i') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Last Updated</label>
+                                <div class="info-value">{{ request.updated_at|date('F d, Y \\a\\t H:i') }}</div>
+                            </div>
+                        </div>
+                        {% if request.estimated_completion %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Estimated Completion</label>
+                                <div class="info-value">{{ request.estimated_completion|date('F d, Y') }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if request.processing_fee %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Processing Fee</label>
+                                <div class="info-value">{{ request.processing_fee|number_format }} {{ request.currency }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if request.description %}
+                        <div class="col-12">
+                            <div class="info-item">
+                                <label class="info-label">Description</label>
+                                <div class="info-value">{{ request.description }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Citizen Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>Citizen Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Full Name</label>
+                                <div class="info-value">{{ request.citizen_name }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Email Address</label>
+                                <div class="info-value">
+                                    <a href="mailto:{{ request.citizen_email }}">{{ request.citizen_email }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% if request.citizen_phone %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Phone Number</label>
+                                <div class="info-value">
+                                    <a href="tel:{{ request.citizen_phone }}">{{ request.citizen_phone }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Request Timeline
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for item in timeline %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h6 class="timeline-title">{{ item.action }}</h6>
+                                    <span class="timeline-date">{{ item.date|date('M d, Y H:i') }}</span>
+                                </div>
+                                <div class="timeline-body">
+                                    <p class="mb-1">{{ item.description }}</p>
+                                    <small class="text-muted">by {{ item.user }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Card -->
+            {% if documents|length > 0 %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-paperclip me-2"></i>Attached Documents
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="documents-list">
+                        {% for document in documents %}
+                        <div class="document-item">
+                            <div class="document-icon">
+                                <i class="fas fa-file-{{ document.type == 'PDF' ? 'pdf text-danger' : 'alt text-secondary' }}"></i>
+                            </div>
+                            <div class="document-info">
+                                <div class="document-name">{{ document.name }}</div>
+                                <div class="document-meta">
+                                    <span>{{ document.type }}</span> •
+                                    <span>{{ document.size }}</span> •
+                                    <span>{{ document.uploaded_at|date('M d, Y') }}</span>
+                                </div>
+                            </div>
+                            <div class="document-status">
+                                <span class="badge bg-{{ document.status == 'approved' ? 'success' : 'warning' }}">
+                                    {{ document.status|title }}
+                                </span>
+                            </div>
+                            <div class="document-actions">
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Comments Card -->
+            {% if comments|length > 0 %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-comments me-2"></i>Comments & Notes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="comments-list">
+                        {% for comment in comments %}
+                        <div class="comment-item">
+                            <div class="comment-avatar">
+                                <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <strong>{{ comment.user }}</strong>
+                                    <span class="text-muted">{{ comment.created_at|date('M d, Y H:i') }}</span>
+                                </div>
+                                <div class="comment-body">
+                                    {{ comment.comment }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-xl-4">
+            <!-- Quick Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if request.status == 'pending' or request.status == 'under_review' %}
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#approveModal">
+                            <i class="fas fa-check me-2"></i>Approve Request
+                        </button>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                            <i class="fas fa-times me-2"></i>Reject Request
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#commentModal">
+                            <i class="fas fa-comment me-2"></i>Add Comment
+                        </button>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#assignModal">
+                            <i class="fas fa-user-plus me-2"></i>Reassign
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Progress Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Progress Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="progress-tracker">
+                        <div class="progress-step completed">
+                            <div class="step-indicator">1</div>
+                            <div class="step-label">Submitted</div>
+                        </div>
+                        <div class="progress-step {{ request.status in ['under_review', 'approved', 'completed'] ? 'completed' : 'pending' }}">
+                            <div class="step-indicator">2</div>
+                            <div class="step-label">Under Review</div>
+                        </div>
+                        <div class="progress-step {{ request.status in ['approved', 'completed'] ? 'completed' : 'pending' }}">
+                            <div class="step-indicator">3</div>
+                            <div class="step-label">Approved</div>
+                        </div>
+                        <div class="progress-step {{ request.status == 'completed' ? 'completed' : 'pending' }}">
+                            <div class="step-indicator">4</div>
+                            <div class="step-label">Completed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Information Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Related Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="info-list">
+                        <div class="info-item-sm">
+                            <span class="info-label-sm">Service Category:</span>
+                            <span class="info-value-sm">Civil Status</span>
+                        </div>
+                        <div class="info-item-sm">
+                            <span class="info-label-sm">Processing Time:</span>
+                            <span class="info-value-sm">3-5 business days</span>
+                        </div>
+                        <div class="info-item-sm">
+                            <span class="info-label-sm">Legal Basis:</span>
+                            <span class="info-value-sm">Law No. 81-02</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approve Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Approval Comment</label>
+                    <textarea class="form-control" id="approvalComment" rows="3" 
+                              placeholder="Enter approval comments..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmApprove">
+                    <i class="fas fa-check me-2"></i>Approve
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="rejectionReason" rows="3" 
+                              placeholder="Enter rejection reason..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmReject">
+                    <i class="fas fa-times me-2"></i>Reject
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Comment Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Comment</label>
+                    <textarea class="form-control" id="newComment" rows="4" 
+                              placeholder="Enter your comment..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="addComment">
+                    <i class="fas fa-comment me-2"></i>Add Comment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const requestId = {{ request.id }};
+    
+    // Confirm approve
+    document.getElementById('confirmApprove').addEventListener('click', function() {
+        const comment = document.getElementById('approvalComment').value;
+        
+        fetch(`/admin/requests/${requestId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `comment=${encodeURIComponent(comment)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while approving the request.');
+        });
+    });
+    
+    // Confirm reject
+    document.getElementById('confirmReject').addEventListener('click', function() {
+        const reason = document.getElementById('rejectionReason').value;
+        
+        if (!reason.trim()) {
+            alert('Please provide a rejection reason.');
+            return;
+        }
+        
+        fetch(`/admin/requests/${requestId}/reject`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `reason=${encodeURIComponent(reason)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while rejecting the request.');
+        });
+    });
+    
+    // Add comment
+    document.getElementById('addComment').addEventListener('click', function() {
+        const comment = document.getElementById('newComment').value;
+        
+        if (!comment.trim()) {
+            alert('Please enter a comment.');
+            return;
+        }
+        
+        // Add comment functionality would be implemented here
+        console.log('Adding comment:', comment);
+    });
+});
+</script>
+{% endblock %}

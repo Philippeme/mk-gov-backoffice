@@ -1,0 +1,519 @@
+{% extends 'admin/layout/base.html.twig' %}
+
+{% block title %}{{ procedure.name }} - {{ 'procedures.show_procedure'|trans }} - MK Gov Backoffice{% endblock %}
+
+{% block page_title %}{{ procedure.name }}{% endblock %}
+
+{% block page_subtitle %}
+    <div class="d-flex align-items-center">
+        <span class="badge bg-{{ procedure.status == 'active' ? 'success' : (procedure.status == 'draft' ? 'secondary' : 'warning') }} me-2">
+            {{ procedure.status|title }}
+        </span>
+        <span class="text-muted">{{ procedure.category }}</span>
+    </div>
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ path('admin_dashboard') }}">{{ 'nav.dashboard'|trans }}</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('admin_procedures') }}">{{ 'nav.procedures'|trans }}</a></li>
+        <li class="breadcrumb-item active">{{ procedure.name }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="procedure-details-container">
+    <!-- Action Bar -->
+    <div class="action-bar mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group" role="group">
+                <a href="{{ path('admin_procedures') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{{ 'buttons.back_to_list'|trans }}
+                </a>
+                <a href="{{ path('admin_procedures_edit', {id: procedure.id}) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i>{{ 'procedures.edit_procedure'|trans }}
+                </a>
+            </div>
+            <div class="btn-group" role="group">
+                <button class="btn btn-success" id="activateProcedure" 
+                        {{ procedure.status == 'active' ? 'disabled' : '' }}>
+                    <i class="fas fa-play me-2"></i>Activate
+                </button>
+                <button class="btn btn-warning" id="pauseProcedure"
+                        {{ procedure.status != 'active' ? 'disabled' : '' }}>
+                    <i class="fas fa-pause me-2"></i>Pause
+                </button>
+                <button class="btn btn-outline-info" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i>{{ 'buttons.print'|trans }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-xl-8">
+            <!-- Procedure Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Procedure Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Procedure Name</label>
+                                <div class="info-value">{{ procedure.name }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Category</label>
+                                <div class="info-value">
+                                    <span class="badge bg-info fs-6">{{ procedure.category }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Status</label>
+                                <div class="info-value">
+                                    <span class="badge bg-{{ procedure.status == 'active' ? 'success' : (procedure.status == 'draft' ? 'secondary' : 'warning') }} fs-6">
+                                        {{ procedure.status|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Processing Time</label>
+                                <div class="info-value">{{ procedure.processing_time }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Service Cost</label>
+                                <div class="info-value">{{ procedure.cost|number_format }} {{ procedure.currency }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Responsible Entity</label>
+                                <div class="info-value">{{ procedure.responsible_entity }}</div>
+                            </div>
+                        </div>
+                        {% if procedure.legal_basis %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Legal Basis</label>
+                                <div class="info-value">{{ procedure.legal_basis }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Priority Level</label>
+                                <div class="info-value">
+                                    <span class="badge bg-{{ procedure.priority_level == 'high' ? 'danger' : (procedure.priority_level == 'medium' ? 'warning' : 'info') }}">
+                                        {{ procedure.priority_level|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Auto Approval</label>
+                                <div class="info-value">
+                                    <span class="badge bg-{{ procedure.auto_approval ? 'success' : 'secondary' }}">
+                                        {{ procedure.auto_approval ? 'Enabled' : 'Disabled' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Created Date</label>
+                                <div class="info-value">{{ procedure.created_at|date('F d, Y \\a\\t H:i') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="info-label">Last Updated</label>
+                                <div class="info-value">{{ procedure.updated_at|date('F d, Y \\a\\t H:i') }}</div>
+                            </div>
+                        </div>
+                        {% if procedure.description %}
+                        <div class="col-12">
+                            <div class="info-item">
+                                <label class="info-label">Description</label>
+                                <div class="info-value">{{ procedure.description }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workflow Steps -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list-ol me-2"></i>{{ 'procedures.workflow_steps'|trans }}
+                    </h5>
+                    <div class="card-tools">
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editWorkflowModal">
+                            <i class="fas fa-edit"></i> Edit Workflow
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="workflow-steps">
+                        {% for step in workflow_steps %}
+                        <div class="workflow-step">
+                            <div class="step-number">{{ step.order }}</div>
+                            <div class="step-content">
+                                <div class="step-header">
+                                    <h6 class="step-title">{{ step.name }}</h6>
+                                    <div class="step-meta">
+                                        <span class="badge bg-secondary">{{ step.responsible_role }}</span>
+                                        <span class="text-muted">{{ step.estimated_duration }}</span>
+                                        {% if step.is_automated %}
+                                        <span class="badge bg-success"><i class="fas fa-robot"></i> Automated</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="step-body">
+                                    <p class="mb-0">{{ step.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Required Documents -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>{{ 'procedures.required_documents'|trans }}
+                    </h5>
+                    <div class="card-tools">
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editDocumentsModal">
+                            <i class="fas fa-edit"></i> Edit Documents
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="required-documents">
+                        {% for document in required_documents %}
+                        <div class="document-requirement">
+                            <div class="document-icon">
+                                <i class="fas fa-file-{{ document.type == 'PDF' ? 'pdf text-danger' : 'alt text-secondary' }}"></i>
+                            </div>
+                            <div class="document-info">
+                                <div class="document-name">
+                                    {{ document.name }}
+                                    {% if document.is_mandatory %}
+                                    <span class="badge bg-danger ms-2">Required</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary ms-2">Optional</span>
+                                    {% endif %}
+                                </div>
+                                <div class="document-description">{{ document.description }}</div>
+                                <div class="document-type">
+                                    <small class="text-muted">Type: {{ document.type }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-xl-4">
+            <!-- Statistics Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Procedure Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-label">Total Requests</div>
+                            <div class="stat-value text-primary">{{ statistics.total_requests }}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-value text-success">{{ statistics.completed_requests }}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Pending</div>
+                            <div class="stat-value text-warning">{{ statistics.pending_requests }}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Rejected</div>
+                            <div class="stat-value text-danger">{{ statistics.rejected_requests }}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Success Rate</div>
+                            <div class="stat-value text-info">{{ statistics.completion_rate }}%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg. Processing</div>
+                            <div class="stat-value text-secondary">{{ statistics.average_processing_time }} days</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Satisfaction</div>
+                            <div class="stat-value text-success">{{ statistics.citizen_satisfaction }}/5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create Test Request
+                        </button>
+                        <button class="btn btn-info">
+                            <i class="fas fa-chart-line me-2"></i>View Analytics
+                        </button>
+                        <button class="btn btn-warning">
+                            <i class="fas fa-download me-2"></i>Export Data
+                        </button>
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#duplicateModal">
+                            <i class="fas fa-copy me-2"></i>Duplicate Procedure
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Chart -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Performance Trend</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Workflow Modal -->
+<div class="modal fade" id="editWorkflowModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Workflow Steps</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="workflowStepsEditor">
+                    <!-- Workflow steps editor would go here -->
+                    <p class="text-muted">Workflow editor interface would be implemented here.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Documents Modal -->
+<div class="modal fade" id="editDocumentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Required Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="documentsEditor">
+                    <!-- Documents editor would go here -->
+                    <p class="text-muted">Documents editor interface would be implemented here.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Procedure Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Duplicate Procedure</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">New Procedure Name</label>
+                    <input type="text" class="form-control" id="newProcedureName" 
+                           value="{{ procedure.name }} (Copy)" placeholder="Enter new procedure name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Copy Options</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="copyWorkflow" checked>
+                        <label class="form-check-label" for="copyWorkflow">
+                            Copy workflow steps
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="copyDocuments" checked>
+                        <label class="form-check-label" for="copyDocuments">
+                            Copy required documents
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="copySettings">
+                        <label class="form-check-label" for="copySettings">
+                            Copy all settings
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="duplicateProcedure">
+                    <i class="fas fa-copy me-2"></i>Create Duplicate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const procedureId = {{ procedure.id }};
+    
+    // Initialize performance chart
+    initializePerformanceChart();
+    
+    // Action handlers
+    document.getElementById('activateProcedure').addEventListener('click', function() {
+        updateProcedureStatus(procedureId, 'active');
+    });
+    
+    document.getElementById('pauseProcedure').addEventListener('click', function() {
+        updateProcedureStatus(procedureId, 'inactive');
+    });
+    
+    document.getElementById('duplicateProcedure').addEventListener('click', function() {
+        const newName = document.getElementById('newProcedureName').value;
+        const copyWorkflow = document.getElementById('copyWorkflow').checked;
+        const copyDocuments = document.getElementById('copyDocuments').checked;
+        const copySettings = document.getElementById('copySettings').checked;
+        
+        if (!newName.trim()) {
+            alert('Please enter a name for the new procedure.');
+            return;
+        }
+        
+        duplicateProcedure(procedureId, {
+            name: newName,
+            copyWorkflow: copyWorkflow,
+            copyDocuments: copyDocuments,
+            copySettings: copySettings
+        });
+    });
+    
+    function updateProcedureStatus(id, status) {
+        fetch(`/admin/procedures/${id}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the procedure status.');
+        });
+    }
+    
+    function duplicateProcedure(id, options) {
+        fetch(`/admin/procedures/${id}/duplicate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(options)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/admin/procedures/${data.newProcedureId}`;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while duplicating the procedure.');
+        });
+    }
+    
+    function initializePerformanceChart() {
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Requests',
+                    data: [65, 78, 90, 81, 95, 102],
+                    borderColor: 'rgb(26, 115, 232)',
+                    backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
